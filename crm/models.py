@@ -11,7 +11,12 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
 
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, related_name='orders', on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, related_name='orders')
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    products = models.ManyToManyField('Product')  # <== Simple M2M
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     order_date = models.DateTimeField(auto_now_add=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def calculate_total(self):
+        self.total_amount = sum(p.price for p in self.products.all())
+        self.save()
+

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'graphene_django',  # <-- Added Graphene Django
     'crm',              # <-- Added your CRM app
+    'django_filters',
 ]
 
 MIDDLEWARE = [

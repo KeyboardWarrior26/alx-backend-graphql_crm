@@ -2,10 +2,10 @@
 
 # Get script's directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+cwd="$(dirname "$SCRIPT_DIR")"  # cwd = current working directory, i.e., project root
 
-# Move to the project root
-cd "$PROJECT_ROOT" || exit
+# Move to the cwd (project root)
+cd "$cwd" || exit
 
 # Define the log file
 LOG_FILE="/tmp/customer_cleanup_log.txt"

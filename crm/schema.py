@@ -38,17 +38,14 @@ class CreateCustomer(graphene.Mutation):
     message = graphene.String()
 
     def mutate(self, info, name, email, phone=None):
-        # Validate email format
         try:
             validate_email(email)
         except ValidationError:
             return CreateCustomer(customer=None, message="Invalid email format.")
 
-        # Validate unique email
         if Customer.objects.filter(email=email).exists():
             return CreateCustomer(customer=None, message="Email already exists.")
 
-        # Validate phone
         if phone and not validate_phone(phone):
             return CreateCustomer(customer=None, message="Invalid phone format.")
 
@@ -77,12 +74,9 @@ class BulkCreateCustomers(graphene.Mutation):
         with transaction.atomic():
             for idx, cust_data in enumerate(input):
                 try:
-                    # Validate email format
                     validate_email(cust_data.email)
-                    # Validate unique email
                     if Customer.objects.filter(email=cust_data.email).exists():
                         raise ValueError("Email already exists")
-                    # Validate phone
                     if cust_data.phone and not validate_phone(cust_data.phone):
                         raise ValueError("Invalid phone format")
 
@@ -151,16 +145,36 @@ class CreateOrder(graphene.Mutation):
 
         return CreateOrder(order=order, message="Order created successfully.")
 
-# Mutation class
+# ✅ UpdateLowStockProducts mutation
+class UpdateLowStockProducts(graphene.Mutation):
+    updated_products = graphene.List(graphene.String)
+    success = graphene.String()
+
+    def mutate(self, info):
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        updated_names = []
+
+        for product in low_stock_products:
+            product.stock += 10
+            product.save()
+            updated_names.append(f"{product.name} ({product.stock})")
+
+        return UpdateLowStockProducts(
+            updated_products=updated_names,
+            success="Stock updated successfully"
+        )
+
+# ✅ Mutation class
 class Mutation(graphene.ObjectType):
     create_customer = CreateCustomer.Field()
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()
 
-# Query class (assuming you have it)
+# Query class
 class Query(graphene.ObjectType):
-    # For example hello
     hello = graphene.String(default_value="Hello, GraphQL!")
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
+

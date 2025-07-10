@@ -151,14 +151,17 @@ class UpdateLowStockProducts(graphene.Mutation):
     success = graphene.String()
 
     def mutate(self, info):
+        # ✅ Queries products with stock < 10
         low_stock_products = Product.objects.filter(stock__lt=10)
         updated_names = []
 
         for product in low_stock_products:
+            # ✅ Increments their stock by 10
             product.stock += 10
             product.save()
             updated_names.append(f"{product.name} ({product.stock})")
 
+        # ✅ Returns a list of updated products and a success message
         return UpdateLowStockProducts(
             updated_products=updated_names,
             success="Stock updated successfully"

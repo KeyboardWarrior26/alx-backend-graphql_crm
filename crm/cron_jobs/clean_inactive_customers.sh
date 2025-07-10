@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Get script's directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+# Move to the project root
+cd "$PROJECT_ROOT" || exit
+
 # Define the log file
 LOG_FILE="/tmp/customer_cleanup_log.txt"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
@@ -19,4 +26,9 @@ EOF
 )
 
 # Log the result
-echo "[$TIMESTAMP] Deleted \$DELETED_COUNT inactive customers." >> \$LOG_FILE
+if [ $? -eq 0 ]; then
+    echo "[$TIMESTAMP] Deleted \$DELETED_COUNT inactive customers." >> \$LOG_FILE
+else
+    echo "[$TIMESTAMP] Error while cleaning customers." >> \$LOG_FILE
+fi
+

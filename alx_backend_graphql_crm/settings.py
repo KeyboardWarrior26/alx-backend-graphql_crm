@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'graphene_django',  # <-- Added Graphene Django
     'crm',              # <-- Added your CRM app
     'django_filters',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+GRAPHENE = {
+    "SCHEMA": "alx-backend-graphql_crm.schema.schema"
+}
+
+CRONJOBS = [
+    ('*/5 * * * *', 'crm.cron.log_crm_heartbeat'),
+    ('0 8 * * *', 'crm.cron.send_order_reminders'),
+    ('0 */12 * * *', 'crm.cron.update_low_stock'),
+]

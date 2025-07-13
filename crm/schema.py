@@ -181,3 +181,13 @@ class Query(graphene.ObjectType):
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
 
+class Query(graphene.ObjectType):
+    hello = graphene.String(default_value="Hello, GraphQL!")
+    customers = graphene.List(CustomerType)
+    orders = graphene.List(OrderType)
+
+    def resolve_customers(self, info):
+        return Customer.objects.all()
+
+    def resolve_orders(self, info):
+        return Order.objects.all()
